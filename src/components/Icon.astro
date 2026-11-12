@@ -1,0 +1,22 @@
+---
+interface Props {
+  name?: 'arrow' | 'external' | 'down' | 'close' | 'chevron' | 'phone' | 'pin' | 'instagram';
+  class?: string;
+}
+const { name = 'arrow', class: className } = Astro.props;
+const paths = {
+  arrow: 'M4 12h15M13 5l7 7-7 7',
+  external: 'M5 19 19 5M5 5h14v14',
+  down: 'M12 4v16M5 13l7 7 7-7',
+  close: 'm6 6 12 12M6 18 18 6',
+  chevron: 'm9 5 7 7-7 7',
+  phone: 'M8 3H4a1 1 0 0 0-1 1c0 9.4 7.6 17 17 17a1 1 0 0 0 1-1v-4l-5-2-2 2a14 14 0 0 1-6-6l2-2-2-5Z',
+  pin: 'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z',
+  instagram: 'M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4Z',
+};
+---
+<svg class={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d={paths[name]} />
+  {name === 'pin' && <circle cx="12" cy="10" r="2.5" />}
+  {name === 'instagram' && <><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none" /></>}
+</svg>
