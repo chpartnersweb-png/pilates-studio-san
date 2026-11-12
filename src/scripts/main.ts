@@ -82,43 +82,11 @@ desktopViewport.addEventListener('change', (event) => {
   if (event.matches && menu?.open) closeDialog(menu);
 });
 
-// Header behavior does not depend on the animation preference.
-const updateHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 35);
+// The navigation begins below the opening photograph, then sticks at the top.
+const hero = document.querySelector<HTMLElement>('.hero');
+const updateHeader = () => header?.classList.toggle('is-scrolled', window.scrollY >= (hero?.offsetHeight ?? 0));
 updateHeader();
 window.addEventListener('scroll', updateHeader, { passive: true });
-
-// The gallery is native horizontal overflow, including touch and keyboard use.
-const track = document.querySelector<HTMLElement>('[data-gallery-track]');
-const galleryPrev = document.querySelector<HTMLButtonElement>('[data-gallery-prev]');
-const galleryNext = document.querySelector<HTMLButtonElement>('[data-gallery-next]');
-
-function updateGalleryControls() {
-  if (!track) return;
-  if (galleryPrev) galleryPrev.disabled = track.scrollLeft <= 2;
-  if (galleryNext) galleryNext.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
-}
-
-function moveGallery(direction: number) {
-  if (!track) return;
-  const firstCard = track.querySelector<HTMLElement>('.gallery-item');
-  const gap = Number.parseFloat(window.getComputedStyle(track).columnGap) || 24;
-  const distance = (firstCard?.getBoundingClientRect().width ?? 300) + gap;
-  track.scrollBy({ left: direction * distance, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
-}
-
-galleryPrev?.addEventListener('click', () => moveGallery(-1));
-galleryNext?.addEventListener('click', () => moveGallery(1));
-track?.addEventListener('scroll', updateGalleryControls, { passive: true });
-track?.addEventListener('keydown', (event) => {
-  // Do not intercept keys on the individual photo buttons.
-  if (event.target !== track) return;
-  if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-    event.preventDefault();
-    moveGallery(event.key === 'ArrowRight' ? 1 : -1);
-  }
-});
-if (track) new ResizeObserver(updateGalleryControls).observe(track);
-updateGalleryControls();
 
 // A native dialog provides focus containment, Escape dismissal and focus return.
 const galleryImages = [...document.querySelectorAll<HTMLButtonElement>('[data-gallery-image]')];
@@ -182,16 +150,16 @@ motion.add('(prefers-reduced-motion: no-preference)', () => {
   // On reloads of deep links, do not replay the opening outside the viewport.
   if (window.scrollY < 100 && (!window.location.hash || window.location.hash === '#top')) {
     gsap.timeline({ defaults: { ease: 'power3.out' } })
-      .from('[data-hero-line]', { yPercent: 115, duration: 1.2, stagger: .12 }, .08)
-      .from('[data-hero-visual]', { autoAlpha: 0, y: 28, duration: 1.45 }, .1)
-      .from('[data-hero-reveal]', { autoAlpha: 0, y: 16, duration: .85, stagger: .1 }, .48);
+      .from('[data-hero-line]', { yPercent: 110, duration: 1.1, stagger: .08 }, .08)
+      .from('[data-hero-visual]', { clipPath: 'inset(0% 0% 100% 0%)', duration: 1.45, ease: 'power2.inOut' }, .2)
+      .from('[data-hero-reveal]', { autoAlpha: 0, duration: .85, stagger: .12 }, .7);
   }
 
   gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((element) => {
     gsap.from(element, {
       autoAlpha: 0,
-      y: 30,
-      duration: .95,
+      y: 18,
+      duration: .9,
       ease: 'power2.out',
       scrollTrigger: { trigger: element, start: 'top 94%', once: true },
     });
@@ -200,9 +168,9 @@ motion.add('(prefers-reduced-motion: no-preference)', () => {
   const parallax = gsap.matchMedia();
   parallax.add('(min-width: 768px)', () => {
     gsap.utils.toArray<HTMLElement>('[data-parallax]').forEach((image) => {
-      gsap.fromTo(image, { yPercent: -3, scale: 1.08 }, {
-        yPercent: 3,
-        scale: 1.08,
+      gsap.fromTo(image, { yPercent: -2, scale: 1.06 }, {
+        yPercent: 2,
+        scale: 1.06,
         ease: 'none',
         scrollTrigger: { trigger: image.parentElement, start: 'top bottom', end: 'bottom top', scrub: 1 },
       });
@@ -220,7 +188,7 @@ motion.add('(prefers-reduced-motion: no-preference)', () => {
 function refreshLayout() {
   lenis?.resize();
   ScrollTrigger.refresh();
-  updateGalleryControls();
+  updateHeader();
 }
 
 if (document.readyState === 'complete') refreshLayout();

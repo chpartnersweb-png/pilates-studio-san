@@ -1,0 +1,20 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { gallery } from '../data/studio';
+
+interface Props {
+  photo: (typeof gallery)[number];
+  class?: string;
+  caption?: boolean;
+}
+const { photo, class: className, caption = true } = Astro.props;
+---
+
+<figure class:list={['studio-photo', className]} data-reveal>
+  <button class="studio-photo__open" type="button" data-gallery-image data-source={photo.image.src} data-title={photo.label} data-alt={photo.alt} aria-label={`${photo.label}の写真を拡大`}>
+    <Image src={photo.image} alt={photo.alt} width={photo.image.width} height={photo.image.height} widths={[360, 720, 1100]} sizes="(max-width: 767px) 90vw, 65vw" format="webp" style={`object-position: ${photo.position}`} />
+    <span class="studio-photo__zoom" aria-hidden="true"><Icon name="external" /></span>
+  </button>
+  {caption && <figcaption>{photo.label}</figcaption>}
+</figure>

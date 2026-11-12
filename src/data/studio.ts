@@ -27,7 +27,7 @@ export const navigation = [
   { href: '#access', en: 'Access', label: 'アクセス' },
 ];
 export const photos = { machineLesson, matLesson, instructor, studioDetail };
-// The other four supplied photographs are used in the main sections.
+// Six studio photographs and three everyday portraits, plus four main images.
 export const gallery = [
   { image: machine01, label: 'プライベートスタジオ', alt: '木製のピラティスマシンと鏡を備えたスタジオの室内', position: 'center' },
   { image: reformer, label: 'マシンと向き合う時間', alt: 'スタジオに設置された木製のピラティスリフォーマー', position: 'center' },
