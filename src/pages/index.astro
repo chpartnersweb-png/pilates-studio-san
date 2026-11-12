@@ -5,10 +5,101 @@ import logo from '../assets/logo-transparent.png';
 import { links, navigation, photos, gallery, prices } from '../data/studio';
 import '../styles/global.css';
 
-const title = 'Pilates studio San｜自由が丘のプライベートピラティス';
-const description = '整うからだ、ピラティスで健康に。自由が丘駅徒歩5分、九品仏駅徒歩7分のPilates studio San。完全プライベート空間で、お一人おひとりのお身体や目的に合わせたピラティスセッションを。レッスン・料金・インストラクター・アクセスをご案内します。';
-const socialImage = Astro.site ? new URL('/ogp.jpg', Astro.site).href : '/ogp.jpg';
-const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const title = '自由が丘・九品仏のプライベートピラティス｜Pilates studio San';
+const description = '自由が丘駅徒歩5分・九品仏駅徒歩7分、世田谷区奥沢のPilates studio San。完全プライベート空間で、お身体や目的に合わせたピラティスを。1回8,500円、5回・10回の回数券あり。料金・インストラクター・アクセス・ご予約をご案内します。';
+if (!Astro.site) throw new Error('astro.config.mjs に公開URL（site）を設定してください。');
+const siteUrl = Astro.site.href;
+const canonical = new URL('/', Astro.site).href;
+const socialImage = new URL('/ogp.jpg', Astro.site).href;
+const studioId = new URL('#studio', Astro.site).href;
+const websiteId = new URL('#website', Astro.site).href;
+const webpageId = new URL('#webpage', Astro.site).href;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': websiteId,
+      url: siteUrl,
+      name: 'Pilates studio San',
+      alternateName: 'ピラティススタジオサン',
+      inLanguage: 'ja',
+      publisher: { '@id': studioId },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': webpageId,
+      url: canonical,
+      name: title,
+      description,
+      inLanguage: 'ja',
+      isPartOf: { '@id': websiteId },
+      mainEntity: { '@id': studioId },
+    },
+    {
+      '@type': 'ExerciseGym',
+      '@id': studioId,
+      name: 'Pilates studio San',
+      alternateName: 'ピラティススタジオサン',
+      url: canonical,
+      description: '自由が丘駅徒歩5分・九品仏駅徒歩7分。大人の方を対象に、お一人おひとりのお身体や目的に合わせたピラティスセッションを行う完全プライベートのスタジオです。休講日は不定休です。',
+      telephone: '+81-90-1497-1628',
+      logo: new URL(logo.src, Astro.site).href,
+      image: [gallery[0].image, photos.studioDetail, photos.machineLesson].map((photo) => new URL(photo.src, Astro.site).href),
+      address: {
+        '@type': 'PostalAddress',
+        postalCode: '158-0038',
+        addressRegion: '東京都',
+        addressLocality: '世田谷区',
+        streetAddress: '奥沢7-7-21 カーサアビエルタ013',
+        addressCountry: 'JP',
+      },
+      hasMap: links.map,
+      sameAs: [links.instagram, links.line],
+      priceRange: '¥8,500〜¥75,000',
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          opens: '09:00',
+          closes: '20:00',
+        },
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Saturday', 'Sunday'],
+          opens: '09:00',
+          closes: '18:30',
+        },
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: 'https://schema.org/PublicHolidays',
+          opens: '09:00',
+          closes: '18:30',
+        },
+      ],
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'プライベートピラティスのレッスン料金',
+        itemListElement: prices.map((price) => ({
+          '@type': 'Offer',
+          name: price.title,
+          description: price.count === '1' ? 'プライベートレッスン1回。体験レッスンは実施しておりません。' : `${price.count}回分のプライベートレッスン。${price.validity}。`,
+          price: price.amount.replaceAll(',', ''),
+          priceCurrency: 'JPY',
+          url: new URL('#price', Astro.site).href,
+          itemOffered: {
+            '@type': 'Service',
+            name: `プライベートピラティス ${price.title}`,
+            serviceType: 'プライベートピラティス',
+            provider: { '@id': studioId },
+          },
+        })),
+      },
+    },
+  ],
+};
+// Escape HTML-significant characters before embedding JSON in a script element.
+const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c');
 const mapQuery = encodeURIComponent('Pilates studio San 東京都世田谷区奥沢7-7-21 カーサアビエルタ');
 ---
 
@@ -18,23 +109,27 @@ const mapQuery = encodeURIComponent('Pilates studio San 東京都世田谷区奥
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="theme-color" content="#eeedea" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    {canonical && <link rel="canonical" href={canonical} />}
+    <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ja_JP" />
     <meta property="og:site_name" content="Pilates studio San" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={socialImage} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1080" />
     <meta property="og:image:height" content="1080" />
     <meta property="og:image:alt" content="Pilates studio Sanのロゴ" />
-    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content="Pilates studio Sanのロゴ" />
+    <script type="application/ld+json" is:inline set:html={structuredDataJson} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Sans+JP:wght@400;500;600&family=Noto+Serif+JP:wght@400;500&display=swap" rel="stylesheet" />
@@ -68,7 +163,7 @@ const mapQuery = encodeURIComponent('Pilates studio San 東京都世田谷区奥
         <div class="hero__copy">
           <p class="eyebrow hero__eyebrow" data-hero-reveal><span class="tiny-sun" aria-hidden="true"></span>JIYUGAOKA · PRIVATE PILATES</p>
           <h1 id="hero-title"><span class="hero__line"><span data-hero-line>整うからだ、</span></span><span class="hero__line"><span data-hero-line>ピラティスで</span></span><span class="hero__line hero__line--coral"><span data-hero-line>健康に。</span></span></h1>
-          <p class="hero__description" data-hero-reveal>自分のからだと、ていねいに向き合う。<br />あなたのための、プライベートピラティス。</p>
+          <p class="hero__description" data-hero-reveal>自分のからだと、ていねいに向き合う。<br />自由が丘の、プライベートピラティス。</p>
           <a class="button button--coral hero__button" href={links.reserve} target="_blank" rel="noopener noreferrer" data-hero-reveal>レッスンを予約する<Icon name="external" /></a>
           <p class="hero__location" data-hero-reveal>自由が丘駅 徒歩5分 <span>/</span> 九品仏駅 徒歩7分</p>
         </div>

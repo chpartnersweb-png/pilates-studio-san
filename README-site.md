@@ -11,6 +11,9 @@ Astro / GSAP / ScrollTrigger / Lenisを使用しています。
 - `src/scripts/main.ts` — スクロール演出、モバイルメニュー、写真ギャラリー
 - `src/assets/logo-transparent.png` — 背景透過済みのロゴ
 - `public/ogp.jpg` — ご提供の `src/assets/logo.jpg` のコピー
+- `public/robots.txt` — クローラーのアクセス許可とサイトマップURL
+- `public/sitemap.xml` — 公開ページのサイトマップ
+- `src/pages/404.astro` — 存在しないURLのエラーページ（noindex）
 
 ## 開発サーバー
 
@@ -21,11 +24,25 @@ npm run dev -- --background
 終了・状態・ログは `npm run astro -- dev stop`、`npm run astro -- dev status`、
 `npm run astro -- dev logs` で管理します。
 
-## 公開先が決まったら
+## 公開URL・SEO
 
-`astro.config.mjs` の `defineConfig` に `site: 'https://公開先のドメイン'` を設定してください。
-OGP画像URL・canonical URL・og:urlにこの値を使います。
-ドメイン未設定時には仮のドメインを生成せず、OGP画像は `/ogp.jpg` を参照します。
+公開URLは `https://pilates-studio-san.pages.dev/` です。
+`astro.config.mjs` の `site` に設定し、canonical・OGP画像・構造化データのURLに使用しています。
+公開先を変更する場合は `site` に加えて `public/robots.txt` と `public/sitemap.xml` のURLも更新してください。
+
+- タイトル：自由が丘・九品仏のプライベートピラティス｜Pilates studio San
+- 説明文：最寄り駅・世田谷区奥沢・完全プライベート・料金を、実際の掲載内容に合わせて記載。
+- canonicalとOGPのURLは、公開URLを基準とした絶対URLで出力。
+- JSON-LDで `WebSite`・`WebPage`・`ExerciseGym` を関連付け、店舗名・住所・電話番号・営業時間・料金を出力。
+- 料金は `src/data/studio.ts` の表示用データから構造化データも作成。
+- 祝日の営業時間は `PublicHolidays` として別途指定。不定休の説明も掲載。
+- robots.txtはクロールを許可し、サイトマップを案内。
+- サイトマップには正規のトップページだけを掲載。ページ内のアンカーと404ページは含めていません。
+- Astroの404ページを用意し、Cloudflare Pagesで存在しないURLがトップページとして配信される既定動作を避けます。
+
+公開後は、Google Search ConsoleでこのURLの所有権を確認したうえで、
+`https://pilates-studio-san.pages.dev/sitemap.xml` を送信し、トップページのURL検査からインデックス登録をリクエストできます。
+Search Consoleの所有権確認用トークンや管理権限は、このリポジトリには設定していません。
 
 ## 掲載内容
 
